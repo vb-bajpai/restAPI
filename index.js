@@ -1,20 +1,37 @@
-import express from "express";
-import bodyParser from "body-parser";
-import usersRoutes from './routes/users.js';
+const express = require('express');
+const connection =require('./config');
+const Employee=require('./Employe');
 const app=express();
-/*const {MongoClient}=require('mongodb');
-const url = 'mongodb://localhost:27017';
-async function getData()
-{
-    let result= await clientInformation.connect();
-    let db=result.db(database);
-    let collection=db.collection('products');
-    let response=await collection.find({}).toArray();
-    console.log(response);
-}*/
-const PORT=5000;
-app.use(bodyParser.json());
-app.use('/users',usersRoutes);
+let data=[]
+app.use(express.json());
 app.get('/',(req,res)=>res.send('Hello from Homepage.'));
-//app.get('../pc',(req,res)=>res.send('Hello from pc  Homepage.'));
-app.listen(PORT,()=> console.log('Server running on port: http://localhost: ${PORT}'));
+app.get("/list",async(req,resp)=>{
+    let data = await Employee.find();
+    resp.send(data);
+})
+app.post("/create",async(req,resp)=>{
+    let data=new Employee(req.body);
+    let result= await data.save();
+    console.log(result)
+    resp.send(result);
+})
+app.get("/list",async(req,resp)=>{
+    let data = await Employee.find();
+    resp.send(data);
+})
+app.delete("/delete/:id",async(req,resp)=>{
+    console.log(req.params)
+    let data=await Employee.deleteOne(req.params);
+    resp.send(data);
+})
+app.put("/update/:id",async(req,resp)=>{
+    console.log(req.params)
+    let data=await Employee.updateOne(
+        req.params,
+        {
+            $set:req.body
+        }
+    );
+    resp.send(data);
+})
+app.listen(5000);
