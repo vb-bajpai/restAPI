@@ -19,19 +19,70 @@ app.get("/list",async(req,resp)=>{
     let data = await Employee.find();
     resp.send(data);
 })
-app.delete("/delete/:id",async(req,resp)=>{
-    console.log(req.params)
-    let data=await Employee.deleteOne(req.params);
+app.delete("/delete/:id", async (req, resp) => {
+    console.log(req.params.id);
+    let data = await Employee.deleteOne({ _id: req.params.id });
     resp.send(data);
-})
-app.put("/update/:id",async(req,resp)=>{
-    console.log(req.params)
+  });
+  
+/*app.put("/update/:id",async(req,resp)=>{
+    console.log(req.params.id)
     let data=await Employee.updateOne(
-        req.params,
+        _id:req.params.id,
         {
             $set:req.body
         }
     );
     resp.send(data);
-})
-app.listen(5000);
+})*/
+app.put("/update/:id", async (req, resp) => {
+    console.log(req.params.id);
+    let data = await Employee.updateOne(
+      { _id: req.params.id },
+      {
+        $set: req.body,
+      }
+    );
+    resp.send(data);
+  });
+  app.get("/search/:key", async (req, resp) => {
+    console.log(req.params.key);
+    let data = await Employee.find({
+      $or: [
+        { firstName: { $regex: req.params.key } },
+        { lastname: { $regex: req.params.key } }
+      ]
+    });
+    resp.send(data);
+  });
+  app.get("/list-with-experience/:key", async (req, res) => {
+    console.log(req.params.key);
+      let data = await Employee.aggregate([
+        /*  {
+          "$match":
+            {
+                $or: [
+                    { firstName: { $regex: req.params.key } },
+                    { lastname: { $regex: req.params.key } }
+                  ]
+
+            }
+        },*/
+        {
+          $lookup: {
+            from: "experience",
+            localField: "_id",
+            foreignField: "eid",
+            as: "exp",
+          },
+        },
+        {"$limit": 3},
+        {$project: {
+            _id: "$_id",
+            firstName: "$firstName"
+        }},
+        {"$sort": {"firstName": 1}},
+      ]);
+      res.send(data);
+  });
+app.listen(8080);
