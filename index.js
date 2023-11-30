@@ -4,7 +4,7 @@ const Employee=require('./Employe');
 const app=express();
 let data=[]
 app.use(express.json());
-app.get('/',(req,res)=>res.send('Hello from Homepage.'));
+app.get('/',(req,res)=>res.send('Hello from Homepage. And hi'));
 app.get("/list",async(req,resp)=>{
     let data = await Employee.find();
     resp.send(data);
