@@ -84,7 +84,7 @@ describe('/PUT employee update',()=>{
     });
     describe('/DELETE/:id Employee', () => {
         it('it should DELETE a book given the id', (done) => {
-            let emp = new Employee({firstName: "Parv", lastname: "verma", age:30})
+            let emp = new Employee({firstName: "Parv", lastname: "Verma", age:30})
             const employeeId = "6494db4db899cf6d248ba090";
             request(app)
               .delete(`/delete/${employeeId}`)
